@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Will You Be Mine?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+  body {
+    margin: 0; padding: 0;
+    background-image:
+      url('https://www.transparenttextures.com/patterns/asfalt-light.png'),
+      linear-gradient(135deg, #ff9a9e, #fad0c4);
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+    font-family: 'Pacifico', cursive;
+    color: white;
+    overflow-x: hidden;
+    animation: fadeInPage 1.5s ease forwards;
+    opacity: 0;
+  }
+  @keyframes fadeInPage { to { opacity: 1; } }
+  #container {
+    max-width: 600px;
+    margin: 3rem auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 0 25px #ff6f91;
+    position: relative;
+    text-align: center;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  #overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ff4382;
+    font-family: 'Pacifico', cursive;
+    font-size: 2.8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10000;
+    user-select: none;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .handwriting-span {
+    white-space: nowrap;
+    display: inline-block;
+  }
+  .handwriting-letter {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .handwriting-letter.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  .handwriting-space {
+    display: inline-block;
+    width: 0.45em;
+    min-width: 0.45em;
+    max-width: 0.45em;
+    content: '\00a0';
+  }
+  .typed-text, #overlayText {
+    word-break: break-word;
+    white-space: pre-wrap;
+    text-align: center;
+    font-size: 1.6rem;
+    margin: 0 auto;
+  }
+  button {
+    background-color: #ff6f91;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 15px #ff6f91;
+    transition: background-color 0.3s ease, opacity 0.6s ease;
+    user-select: none;
+  }
+  button:hover, button:active { background-color: #ff4382; }
+  #story, #puzzle, #proposal, .choice-btns {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    display: none;
+    text-align: center;
+  }
+  #story p {
+    font-size: 1.1rem;
+    margin: 1rem 0;
+  }
+  #puzzle { margin-top: 2rem; }
+  input[type="text"] {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    width: 200px;
+    margin-right: 1rem;
+    box-shadow: 0 0 5px #ff6f91;
+    transition: box-shadow 0.3s ease;
+  }
+  input[type="text"]:focus { box-shadow: 0 0 12px #ff5382; }
+  #proposal {
+    font-size: 2rem;
+    margin-top: 2rem;
+    color: #ffcee4;
+    text-shadow: 0 0 15px #ff4382, 0 0 40px #ff4382;
+    animation: glow 2.5s ease-in-out infinite alternate;
+    text-align: center;
+  }
+  .choice-btns { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1.5rem;}
+  .choice-btns button { background-color: #fff; color: #ff4382; box-shadow: 0 0 12px #ff4382; font-weight: 600; width: 100px; cursor: pointer; }
+  .choice-btns button:hover { background-color: #ffd3e0; }
+  .heart {
+    position: fixed;
+    font-size: 1.5rem;
+    color: #ff4382;
+    animation: floatUp 5s linear infinite;
+    user-select: none;
+    pointer-events: none;
+  }
+  @keyframes floatUp { 0% {transform: translateY(0) translateX(0) scale(1);opacity:1;}
+    100% {transform: translateY(-100vh) translateX(40px) scale(1.5);opacity:0;} }
+  @keyframes glow { 0% {text-shadow: 0 0 15px #ff4382, 0 0 30px #ff4382;} 100% {text-shadow: 0 0 30px #ff6f91, 0 0 60px #ff6f91;} }
+  .petals {
+    position: fixed; top: 0; left: 0; pointer-events: none;
+    width: 100vw; height: 100vh; overflow: visible; z-index: 5;
+  }
+  .petal {
+    position: absolute; top: -50px; color: #ffb7c5;
+    font-size: 20px; user-select: none;
+    animation-name: fall, sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 1;}
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0;}
+  }
+  @keyframes sway {
+    0%, 100% { transform: translateX(0);}
+    50% { transform: translateX(20px);}
+  }
+  @keyframes scatter {
+    100% {
+      opacity: 0;
+      transform: translateY(-80px) scale(2) rotate(60deg);
+      filter: blur(8px);
+    }
+  }
+  .scatter-effect > * { animation: scatter 1.2s forwards; }
+  #bigHeart {
+    position: fixed;
+    top: 45%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 7rem;
+    color: #ff4081;
+    opacity: 0;
+    z-index: 11000;
+    pointer-events: none;
+    animation: popin 1s 1.2s forwards;
+    text-shadow: 0 0 40px #ffb7d5, 0 0 100px #ffb7d5;
+    filter: drop-shadow(0 0 26px #ffccf5);
+    display: none;
+  }
+  @keyframes popin {
+    0% { transform: translate(-50%,-50%) scale(0.3); opacity: 0; }
+    55% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; }
+    80% { transform: translate(-50%,-50%) scale(0.95); }
+    100%{ transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  }
+  #loveMsg {
+    position: fixed;
+    top: 63%; left: 50%;
+    transform: translate(-50%,0);
+    color: #fff;
+    text-shadow: 0 1px 20px #ff4590, 0 0 10px #ffb7d5;
+    font-size: 3.2rem;
+    opacity: 0;
+    z-index: 11020;
+    animation: fadeLove 1s 1.5s forwards;
+    font-family: 'Pacifico', cursive;
+    display: none;
+  }
+  @keyframes fadeLove { 0% { opacity: 0; } 100%{ opacity: 1; } }
+  .sparkle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 11100;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    opacity: 0.8;
+    background: radial-gradient(circle, #ffccf5 60%, #fff 100%);
+    animation: sparkleAnim 1.2s forwards;
+  }
+  @keyframes sparkleAnim {
+    0% { opacity: 0.9; transform: scale(1);}
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: scale(0.2);}
+  }
+</style>
+</head>
+<body>
+  <audio id="bg-music" loop>
+    <source src="violin.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="typing-sound">
+    <source src="typing.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+  <div id="overlay">
+    <span id="overlayText"></span><span id="cursor">|</span>
+  </div>
+  <div id="container" aria-live="polite">
+    <div class="typed-text" id="loveLetter"></div>
+    <button id="storyBtn" style="display:none; opacity:0;" aria-hidden="true">Read My Story</button>
+    <div id="story" style="display:none; opacity:0;">
+      <p>From the moment I saw you, the world felt brighter...</p>
+      <p>Your smile, your laughter, they're etched in my heart.</p>
+      <p>Every day, I learn how wonderful you truly are.</p>
+      <p>And so, here I am, with all my heart — will you be mine?</p>
+    </div>
+    <div id="puzzle" style="display:none; opacity:0;">
+      <p>Solve this riddle to unlock my heart:</p>
+      <p><em>I'm always with you, yet invisible,<br />You cannot see me, but feel me still.<br />What am I?</em></p>
+      <input type="text" id="answerInput" placeholder="Your answer here..." />
+      <button id="solveBtn">Solve</button>
+    </div>
+    <div id="proposal" style="display:none; opacity:0;">Will You Be Mine?</div>
+    <div class="choice-btns" style="display:none; opacity:0;">
+      <button id="yesBtn">Yes 💖</button>
+      <button id="noBtn">No 😢</button>
+    </div>
+    <div id="finalMsg" style="margin-top: 2rem; font-size: 1.3rem;"></div>
+  </div>
+  <div class="petals" id="petalContainer"></div>
+  <div id="bigHeart">💖</div>
+  <div id="loveMsg">I Love You!</div>
+<script>
+const overlayTextFull = "Tap to reveal my proposal ❤";
+let overlayTextIndex = 0;
+const overlay = document.getElementById("overlay");
+const overlayTextElem = document.getElementById("overlayText");
+const loveLetterText = `Dear Grishma,
+
+Every time I see you, my heart starts beating faster than usual—it’s a feeling I can’t explain but only feel deeply. When I look into your eyes, everything around me fades, and I feel something different, something truly special.
+
+From the very first moment I saw you, I knew that feeling was unlike anything I had ever experienced before. It was new, powerful, and unforgettable—a feeling I never knew I could have.
+
+You’ve captured my heart in ways I can’t put into words, and every time I think of you, that same magical feeling comes rushing back. I cherish you more than you know, and I want to share all those moments and feelings with you.
+
+So today, I gather all my courage and honesty to ask you this from the depths of my heart:  
+Will you be mine?`;
+const greetingLength = "Dear Grishma,".length;
+const greetingSpeed = 454;
+const mainSpeed = 50;
+let index = 0;
+const loveLetterDiv = document.getElementById("loveLetter");
+const bgMusic = document.getElementById("bg-music");
+const typingSound = document.getElementById("typing-sound");
+const storyBtn = document.getElementById("storyBtn");
+const storyDiv = document.getElementById("story");
+const puzzleDiv = document.getElementById("puzzle");
+const proposalDiv = document.getElementById("proposal");
+const choiceBtnsDiv = document.querySelector(".choice-btns");
+const answerInput = document.getElementById("answerInput");
+const solveBtn = document.getElementById("solveBtn");
+const finalMsg = document.getElementById("finalMsg");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+let musicStarted = false;
+let typingStarted = false;
+let overlayRevealing = false;
+
+async function animateLetter(letterElem) {
+  return new Promise(resolve => {
+    letterElem.classList.add("handwriting-letter");
+    setTimeout(() => {
+      letterElem.classList.add("visible");
+      resolve();
+    }, 50);
+  });
+}
+
+async function revealOverlayText() {
+  overlayTextElem.innerHTML = "";
+  while (overlayTextIndex < overlayTextFull.length) {
+    const ch = overlayTextFull[overlayTextIndex];
+    let span = document.createElement("span");
+    if (ch === " ") {
+      span.textContent = "\u00A0";
+      span.className = "handwriting-letter handwriting-space";
+    } else {
+      span.textContent = ch;
+      span.className = "handwriting-letter";
+    }
+    overlayTextElem.appendChild(span);
+    overlayTextIndex++;
+    await animateLetter(span);
+    await delay(200);
+  }
+  overlay.style.transition = "opacity 0.8s ease";
+  overlay.style.opacity = 0;
+  setTimeout(() => {
+    overlay.style.display = "none";
+    document.getElementById("container").style.opacity = 1;
+    startProposalTyping();
+  }, 800);
+}
+
+async function startProposalTyping() {
+  if (!musicStarted) {
+    bgMusic.volume = 0.25;
+    bgMusic.play().catch(() => {});
+    musicStarted = true;
+  }
+  if (!typingStarted) {
+    typingSound.play().catch(() => {});
+    typingStarted = true;
+  }
+  loveLetterDiv.innerHTML = "";
+  index = 0;
+  let word = '';
+  let wordSpans = [];
+  for (; index < loveLetterText.length; index++) {
+    const ch = loveLetterText[index];
+    if (ch === "\n") {
+      flushWord(wordSpans);
+      loveLetterDiv.appendChild(document.createElement("br"));
+      word = '';
+      wordSpans = [];
+      continue;
+    } else if (ch === " ") {
+      flushWord(wordSpans);
+      let spaceSpan = document.createElement("span");
+      spaceSpan.textContent = "\u00A0";
+      spaceSpan.className = "handwriting-letter handwriting-space";
+      loveLetterDiv.appendChild(spaceSpan);
+      await animateLetter(spaceSpan);
+      await delay(mainSpeed);
+      word = '';
+      wordSpans = [];
+      continue;
+    }
+    let span = document.createElement("span");
+    span.textContent = ch;
+    wordSpans.push(span);
+    loveLetterDiv.appendChild(span);
+    await animateLetter(span);
+    await delay(index < greetingLength ? greetingSpeed : mainSpeed);
+  }
+  flushWord(wordSpans);
+  fadeIn(storyBtn);
+  function flushWord(spans) {
+    if (!spans.length) return;
+    const s = document.createElement("span");
+    s.className = "handwriting-span";
+    spans.forEach(c => s.appendChild(c));
+    loveLetterDiv.appendChild(s);
+  }
+}
+
+function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+overlay.addEventListener("click", () => {
+  if (!overlayRevealing) {
+    overlayRevealing = true;
+    revealOverlayText();
+  }
+});
+let touchStartX = 0, touchStartY = 0;
+overlay.addEventListener("touchstart", e => {
+  const t = e.touches[0];
+  touchStartX = t.clientX; touchStartY = t.clientY;
+});
+overlay.addEventListener("touchend", e => {
+  const t = e.changedTouches[0];
+  const dX = t.clientX - touchStartX;
+  const dY = t.clientY - touchStartY;
+  if (Math.abs(dX) > 30 || Math.abs(dY) > 30) {
+    if (!overlayRevealing) {
+      overlayRevealing = true;
+      revealOverlayText();
+    }
+  }
+});
+
+storyBtn.onclick = () => {
+  fadeOut(storyBtn, () => {
+    fadeIn(storyDiv);
+    setTimeout(() => {
+      fadeOut(storyDiv, () => {
+        fadeIn(puzzleDiv);
+      });
+    }, 8000);
+  });
+  if (!typingSound.paused) typingSound.pause();
+};
+solveBtn.onclick = () => {
+  const answer = answerInput.value.trim().toLowerCase();
+  if (answer === "air" || answer === "the air") {
+    fadeOut(puzzleDiv, () => {
+      fadeIn(proposalDiv);
+      choiceBtnsDiv.style.display = "flex";
+      fadeIn(choiceBtnsDiv);
+    });
+  } else {
+    alert("Try again! Hint: It surrounds you but you cannot see it.");
+  }
+};
+yesBtn.onclick = () => {
+  document.getElementById('container').classList.add('scatter-effect');
+  setTimeout(() => {
+    document.getElementById('container').style.opacity = 0;
+    showLoveSequence();
+  }, 1200);
+};
+
+function showLoveSequence() {
+  const bigHeart = document.getElementById('bigHeart');
+  bigHeart.style.display = 'block';
+  setTimeout(()=>{
+    document.getElementById('loveMsg').style.display = 'block';
+    for(let i=0;i<32;i++) setTimeout(makeSparkle,Math.random()*1000+200);
+  }, 300);
+}
+function makeSparkle() {
+  const s = document.createElement("div");
+  s.className = "sparkle";
+  const angle = Math.random()*2*Math.PI;
+  const radius = 120 + Math.random()*80;
+  const cx = window.innerWidth/2 + Math.cos(angle)*radius - 10;
+  const cy = window.innerHeight/2 + Math.sin(angle)*radius - 10;
+  s.style.left = `${cx}px`;
+  s.style.top = `${cy}px`;
+  s.style.background = `radial-gradient(circle, #ffccf5 70%, #fff 100%)`;
+  document.body.appendChild(s); setTimeout(()=>s.remove(),1200);
+}
+noBtn.onclick = () => {
+  finalMsg.textContent = "That's okay. I'm grateful for your time. My feelings remain. 😢";
+  fadeOut(proposalDiv);
+  fadeOut(choiceBtnsDiv);
+};
+window.onload = () => {
+  createHearts();
+  createPetals(20);
+  setInterval(() => createPetals(3), 1000);
+};
+function fadeIn(element, duration = 1000) {
+  element.style.display = element.tagName === "BUTTON" ? "inline-block" : "block";
+  element.style.opacity = 0;
+  let opacity = 0;
+  let interval = 50;
+  let increment = interval / duration;
+  let timer = setInterval(() => {
+    opacity += increment;
+    if (opacity >= 1) {
+      opacity = 1;
+      clearInterval(timer);
+    }
+    element.style.opacity = opacity;
+  }, interval);
+}
+function fadeOut(element, callback, duration = 600) {
+  let opacity = 1;
+  let interval = 50;
+  let decrement = interval / duration;
+  let timer = setInterval(() => {
+    opacity -= decrement;
+    if (opacity <= 0) {
+      opacity = 0;
+      clearInterval(timer);
+      if (callback) callback();
+    }
+    element.style.opacity = opacity;
+  }, interval);
+}
+function createHearts() {
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = 4 + Math.random() * 3 + "s";
+    heart.style.fontSize = 14 + Math.random() * 10 + "px";
+    heart.textContent = "💖";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+  }, 400);
+}
+function createPetals(num) {
+  const container = document.getElementById("petalContainer");
+  for (let i = 0; i < num; i++) {
+    const petal = document.createElement("div");
+    petal.classList.add("petal");
+    petal.style.left = Math.random() * 100 + "vw";
+    petal.style.fontSize = 10 + Math.random() * 20 + "px";
+    petal.style.animationDuration =
+      5 + Math.random() * 5 + "s, " + (2 + Math.random() * 3) + "s";
+    petal.style.animationDelay = Math.random() * 10 + "s, " + Math.random() * 5 + "s";
+    petal.textContent = "🌸";
+    container.appendChild(petal);
+    setTimeout(() => container.removeChild(petal), 15000);
+  }
+}
+</script>
+</body>
+</html>
